@@ -45,8 +45,8 @@ tasktracker-projeto/
 ## Instalação e execução
 
 ```bash
-git clone https://github.com/Alberanif/bootcamp.git
-cd bootcamp
+git clone https://github.com/Alberanif/tasktracker-projeto.git
+cd tasktracker-projeto
 python src/main.py
 ```
 
