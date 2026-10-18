@@ -66,18 +66,58 @@ def cadastrar_tarefa(tarefas, proximo_id):
     return proximo_id + 1
 
 
+def ordenar_tarefas(tarefas):
+    """R7: pendentes primeiro; depois por prioridade (Alta > Média > Baixa) e prazo."""
+    ordem_prioridade = {"Alta": 0, "Média": 1, "Baixa": 2}
+    return sorted(
+        tarefas,
+        key=lambda t: (
+            t["status"] != "Pendente",
+            ordem_prioridade[t["prioridade"]],
+            datetime.strptime(t["data_limite"], "%d/%m/%Y"),
+            t["id"],
+        ),
+    )
+
+
 def visualizar_tarefas(tarefas):
     """Exibe todas as tarefas cadastradas."""
     if not tarefas:
         print("Ainda não existem tarefas cadastradas.")
         return
 
-    for tarefa in tarefas:
+    for tarefa in ordenar_tarefas(tarefas):
         print(f"\n[{tarefa['id']}] {tarefa['titulo']}")
-        print(f"    Descrição : {tarefa['descricao']}")
-        print(f"    Prioridade: {tarefa['prioridade']}")
+        print(f"    Descrição  : {tarefa['descricao'] or '(sem descrição)'}")
+        print(f"    Prioridade : {tarefa['prioridade']}")
         print(f"    Data limite: {tarefa['data_limite']}")
-        print(f"    Status    : {tarefa['status']}")
+        print(f"    Status     : {tarefa['status']}")
+
+    pendentes = sum(1 for t in tarefas if t["status"] == "Pendente")
+    print(f"\nTotal: {pendentes} pendente(s) e {len(tarefas) - pendentes} concluída(s).")
+
+
+def concluir_tarefa(tarefas):
+    """R6: conclui somente uma tarefa existente, sem alterar a lista se o ID for inválido."""
+    if not tarefas:
+        print("Ainda não existem tarefas cadastradas.")
+        return
+
+    visualizar_tarefas(tarefas)
+    entrada = input("\nID da tarefa a concluir: ").strip()
+    if not entrada.isdigit():
+        print("Erro: informe um ID numérico.")
+        return
+
+    for tarefa in tarefas:
+        if tarefa["id"] == int(entrada):
+            if tarefa["status"] == "Concluída":
+                print("Esta tarefa já foi finalizada.")
+            else:
+                tarefa["status"] = "Concluída"
+                print(f"Tarefa '{tarefa['titulo']}' concluída com sucesso!")
+            return
+    print(f"Erro: não existe tarefa com ID {entrada}.")
 
 
 def main():
@@ -93,7 +133,7 @@ def main():
         elif opcao == "2":
             visualizar_tarefas(tarefas)
         elif opcao == "3":
-            print("Funcionalidade ainda não implementada.")
+            concluir_tarefa(tarefas)
         elif opcao == "4":
             print("Encerrando o TaskTracker. Até logo!")
             break
