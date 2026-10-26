@@ -2,7 +2,7 @@
 
 Gerenciador de tarefas em linha de comando (CLI), escrito em Python 3.
 
-Projeto do **Bootcamp II** (Engenharia de Software, Versionamento de Código e Desenvolvimento de Sistemas), Fase 2. A lógica implementada segue o planejamento da Fase 1, disponível em [`docs/planejamento_logico.pdf`](docs/planejamento_logico.pdf).
+Projeto do **Bootcamp II** (Engenharia de Software, Versionamento de Código e Desenvolvimento de Sistemas), Fases 2 e 3. A lógica implementada segue o planejamento da Fase 1, disponível em [`docs/planejamento_logico.pdf`](docs/planejamento_logico.pdf).
 
 **Autor:** Alberani Gertrudes Filho, Ciência de Dados, polo Asa Norte.
 
@@ -28,6 +28,7 @@ Projeto do **Bootcamp II** (Engenharia de Software, Versionamento de Código e D
 ## Tecnologias
 
 - Python 3.9 ou superior (somente biblioteca padrão)
+- Docker e Docker Compose (imagem `python:3.11-slim`)
 - Git e GitHub
 
 ## Estrutura do repositório
@@ -36,6 +37,9 @@ Projeto do **Bootcamp II** (Engenharia de Software, Versionamento de Código e D
 tasktracker-projeto/
 ├── README.md
 ├── .gitignore
+├── .dockerignore
+├── Dockerfile
+├── docker-compose.yml
 ├── docs/
 │   └── planejamento_logico.pdf
 └── src/
@@ -44,6 +48,8 @@ tasktracker-projeto/
 
 ## Instalação e execução
 
+### Execução local (sem Docker)
+
 ```bash
 git clone https://github.com/Alberanif/tasktracker-projeto.git
 cd tasktracker-projeto
@@ -51,6 +57,38 @@ python src/main.py
 ```
 
 Não há dependências externas para instalar.
+
+## Guia Docker
+
+Pré-requisito: Docker instalado (com o plugin Compose). Execute os comandos na raiz do repositório.
+
+Como construir a imagem:
+
+```bash
+docker build -t tasktracker-app .
+```
+
+Como rodar o container em modo isolado:
+
+```bash
+docker run -it --rm tasktracker-app
+```
+
+Como rodar via orquestração (Recomendado):
+
+```bash
+docker compose run --rm tasktracker
+```
+
+Como a CLI usa `input()`, o container precisa de entrada interativa. Por isso o `docker run` leva `-it` e o `docker-compose.yml` define `stdin_open: true` e `tty: true`.
+
+### Arquivos da Fase 3
+
+| Arquivo | Papel |
+|---|---|
+| `Dockerfile` | Empacota a aplicação sobre `python:3.11-slim` (`WORKDIR /app`, `PYTHONUNBUFFERED=1`, `COPY src/ /app/src/`, `CMD ["python", "src/main.py"]`). |
+| `docker-compose.yml` | Orquestra a execução interativa da CLI (`stdin_open` e `tty`). |
+| `.dockerignore` | Mantém fora da imagem arquivos que ela não usa. |
 
 ## Uso
 
@@ -67,4 +105,4 @@ Os dados ficam apenas em memória e são perdidos ao encerrar o programa.
 
 ## Próximos passos
 
-Fase 3: empacotamento, containerização com Docker, testes e deploy.
+Testes automatizados e persistência dos dados em arquivo ou banco.
